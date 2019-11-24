@@ -1,0 +1,17 @@
+program EXAMPLE
+dim name as string ;
+dim flag as int ;
+name = INPUT ;
+if 
+    name == "Sergey"
+then
+    while
+        flag != 5
+    do
+        flag = flag + 1 ;
+        OUTPUT flag
+    end ;
+else
+     OUTPUT "You are not Sergey"
+end ;
+end.
