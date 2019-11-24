@@ -13,12 +13,16 @@ STATSMENT_BLOCK -> STATSMENT
 
 STATSMENT -> DIM
 STATSMENT -> IO
+STATSMENT -> EXPRESSION
 
 
 DIM -> dim
-IO -> io
+IO -> OUTPUT STR
+IO -> input
 
-
+EXPRESSION -> expr
+STR -> str
+OUTPUT -> output
 PROGRAM -> program
 END_DOT -> end.
 DELIMETER -> ;
@@ -133,11 +137,12 @@ class Parser:
                     retval = rule
                     # сдвигаем указатель распознавателя на 1 символ вперед
                     self.stsymb += 1
+                    backtrack += 1
                 # иначе рассматриваемое правило отвергается
                 else:
                     print(f'{"-"*offset}Неверный токен {token}, правило отвергается')
                     # откатываем указатель до состояния в начале правила
-                    pass
+                    #pass
 
             # если правило нетерминальное
             else:
@@ -147,16 +152,18 @@ class Parser:
                     # рекурсивно углубляемся в правило
                     ret = self.parse_block(tokens, aw, offset + 2)
                     # увеличиваем сдвиг указателя распознавателя на вложенные сдвиги
-                    PASS
+                    backtrack += self.buff
                     # если не произошло отката правила
                     if ret:
                         print(f'{"-"*offset}->В дерево добавлено {ret}')
                         tree[1].append(ret)
                     # откат правила
                     else:
+                        # откатываем указатель до состояния в начале правила
                         self.stsymb -= backtrack
+                        self.buff = 0
                         # правило уже не будет распознано; цикл можно прервать
-                        print(f'{"-"*offset}Не удалось распознать правило {rule}, выбираем следующее правило; указатель {}')
+                        print(f'{"-"*offset}Не удалось распознать правило {rule}, выбираем следующее правило; указатель {self.stsymb}')
                         interrupted_flag = True
                         break
                 # если правило распозналось
@@ -164,7 +171,7 @@ class Parser:
                     print(f'{"-"*offset}Прочитано дерево {tree}')
                     retval = tree
                     break 
-                
+        self.buff = backtrack
         return retval
                                 
                 
@@ -183,7 +190,7 @@ class Parser:
         tr = tree.Tree.fromstring(Parser.gettrstr(stree))
         tree.draw_trees(tr)
         
-tokens = "program id io ; dim  end.".split()
+tokens = "program id input ; dim ; output str ; expr end.".split()
 pr = Parser(grammarstr)
 stree = pr.parse(tokens, start = 'S')
-#Parser.getTree(stree)
+Parser.getTree(stree)
