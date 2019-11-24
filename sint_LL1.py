@@ -105,15 +105,23 @@ class Parser:
                 retval = tree
                 break
         return retval
-                    
-#        else:
-#            for rule in filter(lambda rule: rule[0] == awaits, self.grammar):
-#                print(f'{"-"*offset}Ожидается {rule[0]}')
-#                for drule in rule[1]:
-#                    self.parse(tokens, drule, 0, offset + 2)
     
+    def gettrstr(node):
+        if isinstance(node, str):
+            return node
+        else:
+            allstr = []
+            for chnode in node[1]:
+                allstr.append(Parser.gettrstr(chnode))
+            chstr = ' '.join(allstr)
+            return f'({node[0]} {chstr})'
+        
+    
+    def getTree(stree):
+        tr = tree.Tree.fromstring(Parser.gettrstr(stree))
+        tree.draw_trees(tr)
         
 tokens = "1 and 0 and 1 or 1 or 0 and 1".split()
 pr = Parser(grammarstr)
 stree = pr.parse(tokens, start = 'S')
-
+Parser.getTree(stree)
