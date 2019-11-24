@@ -74,27 +74,30 @@ class Parser:
         for rule in filter(lambda rule: rule[0] == awaits, self.grammar):
             retval = None
             print(f'{"-"*offset}Ожидается {rule[0]}({rule[1]})')
+            if self.stsymb >= len(tokens):
+                    print(f'{"-"*offset}Конец входной строки, правило отвергается')
+                    break
             if self.isTerminalRule(rule):
                 token = tokens[self.stsymb]
                 if token == rule[1][0]:
                     print(f'{"-"*offset}->Получено {token}')
                     #return (rule, 1)
-                    retval = (rule, 1)
+                    retval = rule
                     self.stsymb += 1
                     break
                 else:
                     print(f'{"-"*offset}Неверный токен, правило отвергается')
             
-            else:         
+            else:
+                tree = [awaits, []]
                 # для всех элетентов вывода
-                tree = (awaits, [])
                 for aw in rule[1]:
                     # рекурсивно углубляемся в правило
                     ret = self.parse_block(tokens, aw, offset + 2)
                     # если не происходит ошибка вывода
                     if ret:
                         print(f'{"-"*offset}->Получено {ret[0]}')
-                        tree[1].append(ret[0])
+                        tree[1].append(ret)
                     else:
                         retval = None
                         break
@@ -110,7 +113,7 @@ class Parser:
 #                    self.parse(tokens, drule, 0, offset + 2)
     
         
-tokens = "1 and 0 or 1".split()
+tokens = "1 and 0 and 1 or 1 or 0 and 1".split()
 pr = Parser(grammarstr)
 stree = pr.parse(tokens, start = 'S')
 
