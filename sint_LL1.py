@@ -44,6 +44,7 @@ class Parser:
         self.predict = None
         self.predict_stack = []
         self.expr = []
+        self.stsymb = 0
     def grparse(self, grammer):
         grstrs = filter(lambda x: x != '', grammer.split('\n'))
         grtpls = (grstr.split('->') for grstr in grstrs)
@@ -63,22 +64,23 @@ class Parser:
         # ожидаемый символ - начальный символ        
         awaits = start
         # стартовый символ 0
-        stsymb = 0
+        self.stsymb = 0
         # для визуализации парсинга: смещение = 2
         offset = 2
-        return self.parse_block(tokens, awaits, stsymb, offset)
+        return self.parse_block(tokens, awaits, offset)
     
-    def parse_block(self, tokens, awaits, stsymb, offset):
+    def parse_block(self, tokens, awaits, offset):
         lst = list(filter(lambda rule: rule[0] == awaits, self.grammar))
         for rule in filter(lambda rule: rule[0] == awaits, self.grammar):
             retval = None
             print(f'{"-"*offset}Ожидается {rule[0]}({rule[1]})')
             if self.isTerminalRule(rule):
-                token = tokens[stsymb]
+                token = tokens[self.stsymb]
                 if token == rule[1][0]:
                     print(f'{"-"*offset}->Получено {token}')
                     #return (rule, 1)
                     retval = (rule, 1)
+                    self.stsymb += 1
                     break
                 else:
                     print(f'{"-"*offset}Неверный токен, правило отвергается')
@@ -88,18 +90,16 @@ class Parser:
                 tree = (awaits, [])
                 for aw in rule[1]:
                     # рекурсивно углубляемся в правило
-                    ret = self.parse_block(tokens, aw, stsymb, offset + 2)
+                    ret = self.parse_block(tokens, aw, offset + 2)
                     # если не происходит ошибка вывода
                     if ret:
-                        print(f'{"-"*offset}->Получено {ret[0]} | сдвиг {ret[1]}')
-                        stsymb += ret[1]
+                        print(f'{"-"*offset}->Получено {ret[0]}')
                         tree[1].append(ret[0])
                     else:
                         retval = None
                         break
-                print(f'{"-"*offset}Получено {tree} | сдвиг {stsymb}')
-                #return (tree, stsymb)
-                retval = (tree, stsymb)
+                print(f'{"-"*offset}Получено {tree}')
+                retval = tree
                 break
         return retval
                     
