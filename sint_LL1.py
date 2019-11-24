@@ -62,6 +62,7 @@ class Parser:
     def parse_block(self, tokens, awaits, offset):
         lst = list(filter(lambda rule: rule[0] == awaits, self.grammar))
         for rule in filter(lambda rule: rule[0] == awaits, self.grammar):
+            flag = False
             retval = None
             print(f'{"-"*offset}Ожидается {rule[0]}({rule[1]})')
             if self.stsymb >= len(tokens):
@@ -74,7 +75,7 @@ class Parser:
                     #return (rule, 1)
                     retval = rule
                     self.stsymb += 1
-                    break
+                    continue
                 else:
                     print(f'{"-"*offset}Неверный токен, правило отвергается')
             
@@ -90,10 +91,14 @@ class Parser:
                         tree[1].append(ret)
                     else:
                         retval = None
+                        flag = True
                         break
-                print(f'{"-"*offset}Получено {tree}')
-                retval = tree
-                break
+                if flag:
+                    continue
+                else:
+                    print(f'{"-"*offset}Получено {tree}')
+                    retval = tree
+                    break
         return retval
     
     def gettrstr(node):
@@ -111,7 +116,7 @@ class Parser:
         tr = tree.Tree.fromstring(Parser.gettrstr(stree))
         tree.draw_trees(tr)
         
-tokens = "program id io end.".split()
+tokens = "program id io ; dim  end.".split()
 pr = Parser(grammarstr)
 stree = pr.parse(tokens, start = 'S')
 #Parser.getTree(stree)
