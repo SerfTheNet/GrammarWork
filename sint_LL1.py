@@ -5,35 +5,25 @@ from lex import qlex
 
 
 grammarstr = """
-S -> program ID STATSMENT_BLOCK end.
-
-STATSMENT_BLOCK -> DIM
-STATSMENT_BLOCK -> IO  
-STATSMENT_BLOCK -> IF
-STATSMENT_BLOCK -> LOOP
-STATSMENT_BLOCK -> EXPR
-
-DIM -> dim ID as TYPE
-
-IF -> if CONDITION then STATESMENT_BLOCK else STATESMENT_BLOCK end
-IF -> if CONDITION then STATESMENT_BLOCK end
-
-CONDITION -> ID COMPARSION ID
-CONDITION -> ID
+S -> PROGRAM ID STATSMENT_BLOCK END_DOT
 
 
+STATSMENT_BLOCK -> STATSMENT DELIMETER STATSMENT_BLOCK
+STATSMENT_BLOCK -> STATSMENT
 
-"""
+STATSMENT -> DIM
+STATSMENT -> IO
 
-grammarstr = """
-S -> T OR S
-S -> T
-T -> E AND T
-T -> E
-E -> 0
-E -> 1
-AND -> and
-OR -> or
+
+DIM -> dim
+IO -> io
+
+
+PROGRAM -> program
+END_DOT -> end.
+DELIMETER -> ;
+
+ID -> id
 """
 
 
@@ -80,7 +70,7 @@ class Parser:
             if self.isTerminalRule(rule):
                 token = tokens[self.stsymb]
                 if token == rule[1][0]:
-                    print(f'{"-"*offset}->Получено {token}')
+                    print(f'{"-"*offset}->Чтение {token}')
                     #return (rule, 1)
                     retval = rule
                     self.stsymb += 1
@@ -121,7 +111,7 @@ class Parser:
         tr = tree.Tree.fromstring(Parser.gettrstr(stree))
         tree.draw_trees(tr)
         
-tokens = "1 and 0 and 1 or 1 or 0 and 1".split()
+tokens = "program id io end.".split()
 pr = Parser(grammarstr)
 stree = pr.parse(tokens, start = 'S')
-Parser.getTree(stree)
+#Parser.getTree(stree)
