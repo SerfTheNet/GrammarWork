@@ -71,12 +71,15 @@ class Parser:
     def parse_block(self, tokens, awaits, stsymb, offset):
         lst = list(filter(lambda rule: rule[0] == awaits, self.grammar))
         for rule in filter(lambda rule: rule[0] == awaits, self.grammar):
+            retval = None
             print(f'{"-"*offset}Ожидается {rule[0]}({rule[1]})')
             if self.isTerminalRule(rule):
                 token = tokens[stsymb]
                 if token == rule[1][0]:
                     print(f'{"-"*offset}->Получено {token}')
-                    return (rule, 1)
+                    #return (rule, 1)
+                    retval = (rule, 1)
+                    break
                 else:
                     print(f'{"-"*offset}Неверный токен, правило отвергается')
             
@@ -92,9 +95,13 @@ class Parser:
                         stsymb += ret[1]
                         tree[1].append(ret[0])
                     else:
-                        return None
+                        retval = None
+                        break
                 print(f'{"-"*offset}Получено {tree} | сдвиг {stsymb}')
-                return (tree, stsymb)
+                #return (tree, stsymb)
+                retval = (tree, stsymb)
+                break
+        return retval
                     
 #        else:
 #            for rule in filter(lambda rule: rule[0] == awaits, self.grammar):
