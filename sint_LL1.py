@@ -37,6 +37,10 @@ CONDITION -> ID COMPARSION CONST
 COMPARSION -> <
 COMPARSION -> >
 COMPARSION -> ==
+COMPARSION -> >=
+COMPARSION -> !=
+COMPARSION -> <=
+
 
 DIM -> DIM_KW ID AS_KW TYPE
 
@@ -44,7 +48,7 @@ TYPE -> string
 TYPE -> int
 
 IO -> OUTPUT STR
-IO -> input
+IO -> ID EQ_KW INPUT_KW
 
 DIM_KW -> dim
 AS_KW -> as
@@ -53,6 +57,8 @@ WHILE_KW -> while
 DO_KW -> do
 IF_KW -> if
 THEN_KW -> then
+ELSE_KW -> else
+INPUT_KW -> input
 
 STR -> str
 OUTPUT -> output
@@ -75,7 +81,6 @@ class Parser:
         self.predict_stack = []
         self.expr = []
         self.stsymb = 0
-        self.backtrack = []
     def grparse(self, grammer):
         grstrs = filter(lambda x: x != '', grammer.split('\n'))
         grtpls = [grstr.split('->') for grstr in grstrs]
@@ -99,66 +104,17 @@ class Parser:
         # для визуализации парсинга: смещение = 2
         offset = 5
         #
-        self.backtrack = 0
         return self.parse_block(tokens, awaits, offset)
     
     def parse_block(self, tokens, awaits, offset):
-        # для каждого правила с предсказаных заголовком
-        for rule in filter(lambda rule: rule[0] == awaits, self.grammar):
-            backtrack = 0
-            flag = False
-            retval = None
-            print(f'{"-"*offset}Ожидается {rule[0]}({rule[1]})')
-            if self.stsymb >= len(tokens):
-                    print(f'{"-"*offset}Конец входной строки, правило отвергается')
-                    break
-            if self.isTerminalRule(rule):
-                token = tokens[self.stsymb]
-                if token == rule[1][0]:
-                    print(f'{"-"*offset}->Чтение {token}')
-                    #return (rule, 1)
-                    retval = rule
-                    self.stsymb += 1
-                    # сколько символов откатить
-                    backtrack += 1
-                    continue
-                else:
-                    print(f'{"-"*offset}Неверный токен, правило отвергается')
-                    self.stsymb -= self.backtrack.pop()
-            
-            else:
-                tree = [awaits, []]
-                # для всех элетентов вывода
-                for aw in rule[1]:
-                    # рекурсивно углубляемся в правило
-                    
-                    ret = self.parse_block(tokens, aw, offset + 2)
-                    # если не происходит ошибка вывода
-                    if ret:
-                        self.backtrack.append(backtrack)
-                        print(f'{"-"*offset}->Получено {ret[0]}')
-                        tree[1].append(ret)
-                    else:
-                        retval = None
-                        flag = True
-                        break
-                if flag:
-                    continue
-                else:
-                    print(f'{"-"*offset}Прочитано дерево {tree}')
-                    retval = tree
-                    break
-        
-        return retval
-    
-    def parse_block(self, tokens, awaits, offset):
+        retval = None
         # для каждого правила с предсказаных заголовком
         for rule in filter(lambda rule: rule[0] == awaits, self.grammar):
             retval = None
             interrupted_flag = False
+            # запоминаем состояние распознавателя
+            backtrack = self.stsymb
             print(f'{"-"*offset}Ожидается {rule[0]}({rule[1]})')
-            # инициализация переменной, ведущей счет сдвигу распознавателя
-            backtrack = 0
             # если длина правила заведомо больше числа имеющихся токенов, отвергаем его
             if self.stsymb >= len(tokens):
                 print(f'{"-"*offset}Конец входной строки, правило отвергается')
@@ -175,7 +131,6 @@ class Parser:
                     retval = rule
                     # сдвигаем указатель распознавателя на 1 символ вперед
                     self.stsymb += 1
-                    backtrack += 1
                     break
                 # иначе рассматриваемое правило отвергается
                 else:
@@ -190,8 +145,6 @@ class Parser:
                 for aw in rule[1]:
                     # рекурсивно углубляемся в правило
                     ret = self.parse_block(tokens, aw, offset + 2)
-                    # увеличиваем сдвиг указателя распознавателя на вложенные сдвиги
-                    backtrack += self.buff
                     # если не произошло отката правила
                     if ret:
                         print(f'{"-"*offset}->В дерево добавлено {ret}')
@@ -199,8 +152,7 @@ class Parser:
                     # откат правила
                     else:
                         # откатываем указатель до состояния в начале правила
-                        self.stsymb -= backtrack
-                        self.buff = 0
+                        self.stsymb = backtrack
                         # правило уже не будет распознано; цикл можно прервать
                         print(f'{"-"*offset}Не удалось распознать правило {rule}, выбираем следующее правило; указатель {self.stsymb}')
                         interrupted_flag = True
@@ -210,7 +162,6 @@ class Parser:
                     print(f'{"-"*offset}Прочитано дерево {tree}')
                     retval = tree
                     break 
-        self.buff = backtrack
         return retval
                                 
                 
@@ -232,11 +183,19 @@ class Parser:
 progstring = """program id 
 	dim id as string ;
 	dim id as int ;
-	input ;
+	id = input ;
     if 
-		id == const
+		id != const
     then
-		output str
+		while 
+    		id > const
+		do
+    		id = id + const ;
+    		output str
+    	end
+    end
+    else
+        output str
 	end
 end."""
 def tokenize(progstring):

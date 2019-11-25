@@ -1,20 +1,38 @@
 program EXAMPLE
-dim name as string ;
-dim flag as int ;
-name = INPUT ;
-if 
-    name == "Sergey"
-then
-    while
-        flag != 5
-    do
-        flag = flag + 1 ;
-        OUTPUT flag
+    dim name as string ;
+    dim flag as int ;
+    name = input ;
+    if 
+        name == "Sergey"
+    then
+        while
+            flag != 5
+        do
+            flag = flag + 1 ;
+            OUTPUT flag
+        end
     end
-else
-     OUTPUT "You are not Sergey"
-end
+    else
+         output "You are not Sergey"
+    end
 end.
 
 
-program id while id < id do output str ; dim id as string end ; output str ; id = const - id end.
+"""program id 
+	dim id as string ;
+	dim id as int ;
+	id = input ;
+    if 
+		id == const
+    then
+		while 
+    		id != const
+		do
+    		id = id + const ;
+    		output str
+    	end
+    end
+    else
+        output str
+	end
+end."""
