@@ -10,10 +10,10 @@ then
     do
         flag = flag + 1 ;
         OUTPUT flag
-    end ;
+    end
 else
      OUTPUT "You are not Sergey"
-end ;
+end
 end.
 
 

@@ -14,6 +14,7 @@ STATSMENT -> DIM
 STATSMENT -> IO
 STATSMENT -> EXPRESSION
 STATSMENT -> LOOP
+STATSMENT -> IF
 
 EXPRESSION -> ID EQ_KW ID OPERATION ID
 EXPRESSION -> ID EQ_KW ID OPERATION CONST
@@ -23,13 +24,19 @@ EXPRESSION -> ID EQ_KW CONST OPERATION CONST
 OPERATION -> +
 OPERATION -> *
 OPERATION -> -
+OPERATION -> /
 
 LOOP -> WHILE_KW CONDITION DO_KW STATSMENT_BLOCK END_KW
+
+IF -> IF_KW CONDITION THEN_KW STATSMENT_BLOCK END_KW ELSE_KW STATSMENT_BLOCK END_KW
+IF -> IF_KW CONDITION THEN_KW STATSMENT_BLOCK END_KW
 
 CONDITION -> ID COMPARSION ID
 CONDITION -> ID COMPARSION CONST
 
 COMPARSION -> <
+COMPARSION -> >
+COMPARSION -> ==
 
 DIM -> DIM_KW ID AS_KW TYPE
 
@@ -44,6 +51,8 @@ AS_KW -> as
 EQ_KW -> =
 WHILE_KW -> while
 DO_KW -> do
+IF_KW -> if
+THEN_KW -> then
 
 STR -> str
 OUTPUT -> output
@@ -89,6 +98,8 @@ class Parser:
         self.stsymb = 0
         # для визуализации парсинга: смещение = 2
         offset = 5
+        #
+        self.backtrack = 0
         return self.parse_block(tokens, awaits, offset)
     
     def parse_block(self, tokens, awaits, offset):
@@ -218,7 +229,22 @@ class Parser:
         tr = tree.Tree.fromstring(Parser.gettrstr(stree))
         tree.draw_trees(tr)
         
-tokens = "program id while id < id do output str ; dim id as string end ; output str ; id = const - id end.".split()
+progstring = """program id 
+	dim id as string ;
+	dim id as int ;
+	input ;
+    if 
+		id == const
+    then
+		output str
+	end
+end."""
+def tokenize(progstring):
+    proglist = progstring.split()
+    return list(filter(lambda x: x != '', proglist))
+        
+#tokens = "program id dim id as string ; dim id as int ; input ; if id == const then while id > const do id = flag + 1 ; output str end end else output str end end.".split()
+tokens = tokenize(progstring)
 pr = Parser(grammarstr)
 stree = pr.parse(tokens, start = 'S')
 Parser.getTree(stree)
