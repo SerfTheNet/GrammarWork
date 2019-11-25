@@ -7,24 +7,51 @@ from lex import qlex
 grammarstr = """
 S -> PROGRAM ID STATSMENT_BLOCK END_DOT
 
-
 STATSMENT_BLOCK -> STATSMENT DELIMETER STATSMENT_BLOCK
 STATSMENT_BLOCK -> STATSMENT
 
 STATSMENT -> DIM
 STATSMENT -> IO
 STATSMENT -> EXPRESSION
+STATSMENT -> LOOP
 
+EXPRESSION -> ID EQ_KW ID OPERATION ID
+EXPRESSION -> ID EQ_KW ID OPERATION CONST
+EXPRESSION -> ID EQ_KW CONST OPERATION ID
+EXPRESSION -> ID EQ_KW CONST OPERATION CONST
 
-DIM -> dim
+OPERATION -> +
+OPERATION -> *
+OPERATION -> -
+
+LOOP -> WHILE_KW CONDITION DO_KW STATSMENT_BLOCK END_KW
+
+CONDITION -> ID COMPARSION ID
+CONDITION -> ID COMPARSION CONST
+
+COMPARSION -> <
+
+DIM -> DIM_KW ID AS_KW TYPE
+
+TYPE -> string
+TYPE -> int
+
 IO -> OUTPUT STR
 IO -> input
 
-EXPRESSION -> expr
+DIM_KW -> dim
+AS_KW -> as
+EQ_KW -> =
+WHILE_KW -> while
+DO_KW -> do
+
 STR -> str
 OUTPUT -> output
 PROGRAM -> program
 END_DOT -> end.
+END_KW -> end
+CONST -> const
+
 DELIMETER -> ;
 
 ID -> id
@@ -42,7 +69,7 @@ class Parser:
         self.backtrack = []
     def grparse(self, grammer):
         grstrs = filter(lambda x: x != '', grammer.split('\n'))
-        grtpls = (grstr.split('->') for grstr in grstrs)
+        grtpls = [grstr.split('->') for grstr in grstrs]
         grtpls = [[grtpl[0], grtpl[1].split('|')] for grtpl in grtpls]
         grexprs = []
         for grtpl in grtpls:
@@ -109,7 +136,7 @@ class Parser:
                 else:
                     print(f'{"-"*offset}Прочитано дерево {tree}')
                     retval = tree
-                    continue
+                    break
         
         return retval
     
@@ -138,6 +165,7 @@ class Parser:
                     # сдвигаем указатель распознавателя на 1 символ вперед
                     self.stsymb += 1
                     backtrack += 1
+                    break
                 # иначе рассматриваемое правило отвергается
                 else:
                     print(f'{"-"*offset}Неверный токен {token}, правило отвергается')
@@ -190,7 +218,7 @@ class Parser:
         tr = tree.Tree.fromstring(Parser.gettrstr(stree))
         tree.draw_trees(tr)
         
-tokens = "program id input ; dim ; output str ; expr end.".split()
+tokens = "program id while id < id do output str ; dim id as string end ; output str ; id = const - id end.".split()
 pr = Parser(grammarstr)
 stree = pr.parse(tokens, start = 'S')
 Parser.getTree(stree)

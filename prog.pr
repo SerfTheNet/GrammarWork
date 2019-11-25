@@ -15,3 +15,6 @@ else
      OUTPUT "You are not Sergey"
 end ;
 end.
+
+
+program id while id < id do output str ; dim id as string end ; output str ; id = const - id end.
