@@ -19,8 +19,8 @@ def get_tokens(filename):
     tokens = []
     token = ''
     quotes_flag = False
-    for i in progstring:
-        if ((i not in (' ', '\n')) or quotes_flag):
+    for i in progstring + ' ':
+        if ((i not in (' ', '\n', '\t')) or quotes_flag):
             token += i
         else:
             if token != '':
@@ -29,7 +29,6 @@ def get_tokens(filename):
         if i == '"':
             quotes_flag = not quotes_flag
     return tokens
-
 def lexify_tokens(tokens, lex_regulars):
     lexical_table = []
     # В этом цикле лексемы берутся из списка lex_arr и последовательно...
@@ -51,10 +50,13 @@ class token:
     def __init__(self, word, l_type):
         self.word = word
         self.l_type = l_type
-    def read(self):
-        pass
     def __repr__(self):
         return f'{self.word}({self.l_type})'
+    def __str__(self):
+        if self.l_type in ['id', 'const']:
+            return self.l_type
+        else:
+            return self.word
     def __iter__(self):
         return([self.word, self.l_type])
     def __eq__(self, string):
@@ -65,7 +67,7 @@ class token:
             
             
 
-def qlex():
-   tokens = get_tokens('prog.pr')
+def qlex(program_file):
+   tokens = get_tokens(program_file)
    lexarr = lexify_tokens(tokens, lex_regulars)
    return [token(*lex) for lex in lexarr]

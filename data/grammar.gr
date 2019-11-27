@@ -40,7 +40,8 @@ DIM -> DIM_KW ID AS_KW TYPE
 TYPE -> string
 TYPE -> int
 
-IO -> OUTPUT STR
+IO -> OUTPUT CONST
+IO -> OUTPUT ID
 IO -> ID EQ_KW INPUT_KW
 
 DIM_KW -> dim
@@ -53,7 +54,6 @@ THEN_KW -> then
 ELSE_KW -> else
 INPUT_KW -> input
 
-STR -> str
 OUTPUT -> output
 PROGRAM -> program
 END_DOT -> end.

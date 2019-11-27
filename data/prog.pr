@@ -9,7 +9,7 @@ program EXAMPLE
             flag != 5
         do
             flag = flag + 1 ;
-            OUTPUT flag
+            output flag
         end
     end
     else

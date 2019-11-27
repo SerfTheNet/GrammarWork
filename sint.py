@@ -5,7 +5,6 @@ from lex import qlex
 
 class Parser:
     def __init__(self, grammar_file):
-        #self.grammarstr = grammarstr
         self.read_grammar(grammar_file)
         self.grammar = self.grparse(self.grammarstr)
         self.predict = None
@@ -26,9 +25,6 @@ class Parser:
         return grexprs
     def isTerminalRule(self, rule):
         return len(rule[1]) == 1 and rule[1][0] not in map(lambda x: x[0], self.grammar)
-            
-    def get_token(self, tokens):
-        self.expr.append(tokens.pop(0))
         
     def parse(self, tokens, start = 'S'):
         # ожидаемый символ - начальный символ        
@@ -135,8 +131,8 @@ end."""
 def tokenize(progstring):
     proglist = progstring.split()
     return list(filter(lambda x: x != '', proglist))
-
-tokens = tokenize(progstring)
-pr = Parser('data/grammar.gr')
-stree = pr.parse(tokens, start = 'S')
-Parser.getTree(stree)
+#
+#tokens = tokenize(progstring)
+#pr = Parser('data/grammar.gr')
+#stree = pr.parse(tokens, start = 'S')
+#Parser.getTree(stree)
