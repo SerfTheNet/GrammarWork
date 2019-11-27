@@ -16,23 +16,3 @@ program EXAMPLE
          output "You are not Sergey"
     end
 end.
-
-
-"""program id 
-	dim id as string ;
-	dim id as int ;
-	id = input ;
-    if 
-		id == const
-    then
-		while 
-    		id != const
-		do
-    		id = id + const ;
-    		output str
-    	end
-    end
-    else
-        output str
-	end
-end."""

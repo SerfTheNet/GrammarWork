@@ -1,86 +1,20 @@
 # -*- coding: utf-8 -*-
 from nltk.draw import tree
-
+from IPython.display import display
 from lex import qlex
 
-
-grammarstr = """
-S -> PROGRAM ID STATSMENT_BLOCK END_DOT
-
-STATSMENT_BLOCK -> STATSMENT DELIMETER STATSMENT_BLOCK
-STATSMENT_BLOCK -> STATSMENT
-
-STATSMENT -> DIM
-STATSMENT -> IO
-STATSMENT -> EXPRESSION
-STATSMENT -> LOOP
-STATSMENT -> IF
-
-EXPRESSION -> ID EQ_KW ID OPERATION ID
-EXPRESSION -> ID EQ_KW ID OPERATION CONST
-EXPRESSION -> ID EQ_KW CONST OPERATION ID
-EXPRESSION -> ID EQ_KW CONST OPERATION CONST
-
-OPERATION -> +
-OPERATION -> *
-OPERATION -> -
-OPERATION -> /
-
-LOOP -> WHILE_KW CONDITION DO_KW STATSMENT_BLOCK END_KW
-
-IF -> IF_KW CONDITION THEN_KW STATSMENT_BLOCK END_KW ELSE_KW STATSMENT_BLOCK END_KW
-IF -> IF_KW CONDITION THEN_KW STATSMENT_BLOCK END_KW
-
-CONDITION -> ID COMPARSION ID
-CONDITION -> ID COMPARSION CONST
-
-COMPARSION -> <
-COMPARSION -> >
-COMPARSION -> ==
-COMPARSION -> >=
-COMPARSION -> !=
-COMPARSION -> <=
-
-
-DIM -> DIM_KW ID AS_KW TYPE
-
-TYPE -> string
-TYPE -> int
-
-IO -> OUTPUT STR
-IO -> ID EQ_KW INPUT_KW
-
-DIM_KW -> dim
-AS_KW -> as
-EQ_KW -> =
-WHILE_KW -> while
-DO_KW -> do
-IF_KW -> if
-THEN_KW -> then
-ELSE_KW -> else
-INPUT_KW -> input
-
-STR -> str
-OUTPUT -> output
-PROGRAM -> program
-END_DOT -> end.
-END_KW -> end
-CONST -> const
-
-DELIMETER -> ;
-
-ID -> id
-"""
-
-
 class Parser:
-    def __init__(self, grammarstr):
-        self.grammarstr = grammarstr
+    def __init__(self, grammar_file):
+        #self.grammarstr = grammarstr
+        self.read_grammar(grammar_file)
         self.grammar = self.grparse(self.grammarstr)
         self.predict = None
         self.predict_stack = []
         self.expr = []
         self.stsymb = 0
+    def read_grammar(self, grammar_file):
+        with open(grammar_file, 'r') as f:
+            self.grammarstr = f.read()
     def grparse(self, grammer):
         grstrs = filter(lambda x: x != '', grammer.split('\n'))
         grtpls = [grstr.split('->') for grstr in grstrs]
@@ -185,10 +119,10 @@ progstring = """program id
 	dim id as int ;
 	id = input ;
     if 
-		id != const
+		id == const
     then
 		while 
-    		id > const
+    		id != const
 		do
     		id = id + const ;
     		output str
@@ -201,9 +135,8 @@ end."""
 def tokenize(progstring):
     proglist = progstring.split()
     return list(filter(lambda x: x != '', proglist))
-        
-#tokens = "program id dim id as string ; dim id as int ; input ; if id == const then while id > const do id = flag + 1 ; output str end end else output str end end.".split()
+
 tokens = tokenize(progstring)
-pr = Parser(grammarstr)
+pr = Parser('data/grammar.gr')
 stree = pr.parse(tokens, start = 'S')
 Parser.getTree(stree)
