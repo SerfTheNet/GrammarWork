@@ -7,9 +7,11 @@ program_file = 'data/prog.pr'
 grammar_file = 'data/grammar.gr'
 
 
+
 tokens = qlex(program_file)
 token_sint_map = list(map(str, tokens))
 
 parser = Parser(grammar_file)
 stree = parser.parse(token_sint_map, start = 'S')
-Parser.getTree(stree)
+directtree = Parser.reworkTree(stree, tokens)
+Parser.drawTree(directtree)

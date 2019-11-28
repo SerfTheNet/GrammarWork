@@ -105,34 +105,23 @@ class Parser:
             chstr = ' '.join(allstr)
             return f'({node[0]} {chstr})'
         
-    
-    def getTree(stree):
+    def drawTree(stree):
         tr = tree.Tree.fromstring(Parser.gettrstr(stree))
         tree.draw_trees(tr)
-        
-progstring = """program id 
-	dim id as string ;
-	dim id as int ;
-	id = input ;
-    if 
-		id == const
-    then
-		while 
-    		id != const
-		do
-    		id = id + const ;
-    		output str
-    	end
-    end
-    else
-        output str
-	end
-end."""
-def tokenize(progstring):
-    proglist = progstring.split()
-    return list(filter(lambda x: x != '', proglist))
-#
-#tokens = tokenize(progstring)
-#pr = Parser('data/grammar.gr')
-#stree = pr.parse(tokens, start = 'S')
-#Parser.getTree(stree)
+        return tr
+
+    
+
+    def reworkTree(tree, tokens):
+        def rework(node, tokens, pointer):
+            if len(node[1]) == 1 and isinstance(node[1][0], str):
+                node[1][0] = tokens[pointer[0]].word
+                pointer[0] += 1
+            else:
+                for chnode in node[1]:
+                    rework(chnode, tokens, pointer)
+                
+        tree = tree.copy()
+        pointer = [0]
+        rework(tree, tokens, pointer)
+        return tree

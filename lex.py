@@ -46,7 +46,7 @@ def lexify_tokens(tokens, lex_regulars):
     # print lexical_table
     return lexical_table
 
-class token:
+class Token:
     def __init__(self, word, l_type):
         self.word = word
         self.l_type = l_type
@@ -70,4 +70,4 @@ class token:
 def qlex(program_file):
    tokens = get_tokens(program_file)
    lexarr = lexify_tokens(tokens, lex_regulars)
-   return [token(*lex) for lex in lexarr]
+   return [Token(*lex) for lex in lexarr]
