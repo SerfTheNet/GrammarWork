@@ -26,7 +26,7 @@ class Parser:
     def isTerminalRule(self, rule):
         return len(rule[1]) == 1 and rule[1][0] not in map(lambda x: x[0], self.grammar)
         
-    def parse(self, tokens, start = 'S'):
+    def parse(self, tokens, tok_orig, start = 'S'):
         # ожидаемый символ - начальный символ        
         awaits = start
         # стартовый символ 0
@@ -34,9 +34,9 @@ class Parser:
         # для визуализации парсинга: смещение = 2
         offset = 5
         #
-        return self.parse_block(tokens, awaits, offset)
+        return self.parse_block(tokens, awaits, offset, tok_orig)
     
-    def parse_block(self, tokens, awaits, offset):
+    def parse_block(self, tokens, awaits, offset, tok_orig):
         retval = None
         # для каждого правила с предсказаных заголовком
         for rule in filter(lambda rule: rule[0] == awaits, self.grammar):
@@ -58,7 +58,7 @@ class Parser:
                 if token == rule[1][0]:
                     print(f'{"-"*offset}->Токен {token} удовлетворяет предсказанию')
                     # устанавливаем значение возврата на это правило
-                    retval = rule
+                    retval = tok_orig[self.stsymb].word
                     # сдвигаем указатель распознавателя на 1 символ вперед
                     self.stsymb += 1
                     break
@@ -74,7 +74,7 @@ class Parser:
                 # для каждого выврдимого символа правила
                 for aw in rule[1]:
                     # рекурсивно углубляемся в правило
-                    ret = self.parse_block(tokens, aw, offset + 2)
+                    ret = self.parse_block(tokens, aw, offset + 2, tok_orig)
                     # если не произошло отката правила
                     if ret:
                         print(f'{"-"*offset}->В дерево добавлено {ret}')
