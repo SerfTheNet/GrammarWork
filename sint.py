@@ -58,7 +58,7 @@ class Parser:
                 if token == rule[1][0]:
                     print(f'{"-"*offset}->Токен {token} удовлетворяет предсказанию')
                     # устанавливаем значение возврата на это правило
-                    retval = tok_orig[self.stsymb].word
+                    retval = tok_orig[self.stsymb].getToTree()
                     # сдвигаем указатель распознавателя на 1 символ вперед
                     self.stsymb += 1
                     break
@@ -109,19 +109,3 @@ class Parser:
         tr = tree.Tree.fromstring(Parser.gettrstr(stree))
         tree.draw_trees(tr)
         return tr
-
-    
-
-    def reworkTree(tree, tokens):
-        def rework(node, tokens, pointer):
-            if len(node[1]) == 1 and isinstance(node[1][0], str):
-                node[1][0] = tokens[pointer[0]].word
-                pointer[0] += 1
-            else:
-                for chnode in node[1]:
-                    rework(chnode, tokens, pointer)
-                
-        tree = tree.copy()
-        pointer = [0]
-        rework(tree, tokens, pointer)
-        return tree

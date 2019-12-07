@@ -8,7 +8,8 @@ lex_regulars = [
         (r'(^==$)|(^>$)|(^<$)|(^>=$)|(^<=$)|(^!=$)', 'logic'),
         (r'(^;$)', 'block delimeter'),
         (r'(^string$)|(^int$)', 'type'),
-        (r'(^"[^"]*"$)|(^-?\d+$)', 'const'),
+        (r'(^"[^"|]*"$)', 'const', 'str'),
+        (r'(^-?\d+$)', 'const', 'int'),
         (r'^[a-zA-Z_@#!][a-zA-Z_\d]*$', 'id'),     
         ]
 
@@ -37,7 +38,10 @@ def lexify_tokens(tokens, lex_regulars):
         def_f = True
         for j in lex_regulars:
             if re.match(j[0], i):
-                lexical_table.append([i, j[1]])
+                if len(j) == 3:
+                    lexical_table.append([i, j[1], j[2]])
+                else:
+                    lexical_table.append([i, j[1]])
                 #print([i, j[1]])
                 def_f = False
                 break
@@ -47,9 +51,10 @@ def lexify_tokens(tokens, lex_regulars):
     return lexical_table
 
 class Token:
-    def __init__(self, word, l_type):
+    def __init__(self, word, l_type, inprog_type = None):
         self.word = word
         self.l_type = l_type
+        self.inprog_type = inprog_type
     def __repr__(self):
         return f'{self.word}({self.l_type})'
     def __str__(self):
@@ -64,10 +69,15 @@ class Token:
             return self.l_type == string
         else:
             return self.word
-            
+    def getToTree(self):
+        if self.l_type == 'const':
+            return self.word + '|' + self.inprog_type
+        else:
+            return self.word
             
 
 def qlex(program_file):
    tokens = get_tokens(program_file)
    lexarr = lexify_tokens(tokens, lex_regulars)
+   print(lexarr)
    return [Token(*lex) for lex in lexarr]

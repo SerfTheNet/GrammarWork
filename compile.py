@@ -11,5 +11,4 @@ token_sint_map = list(map(str, tokens))
 
 parser = Parser(grammar_file)
 stree = parser.parse(token_sint_map, tokens, start = 'S')
-#directtree = Parser.reworkTree(stree, tokens)
 Parser.drawTree(stree)
