@@ -6,8 +6,6 @@ from sint import Parser
 program_file = 'data/prog.pr'
 grammar_file = 'data/grammar.gr'
 
-
-
 tokens = qlex(program_file)
 token_sint_map = list(map(str, tokens))
 
