@@ -77,7 +77,9 @@ def loop(while_node, id_type_dict):
 
 def expression(expr_node, id_type_dict):
     del_type(expr_node, 2)
-    del_type(expr_node, 4)
+    # если присваивания с двумя операторами
+    if len(expr_node[1] == 5):    
+        del_type(expr_node, 4)
     return f'{" ".join(expr_node[1])}; \n'
 
 def del_type(node, typed_const_position):
