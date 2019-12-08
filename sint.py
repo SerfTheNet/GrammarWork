@@ -44,19 +44,19 @@ class Parser:
             interrupted_flag = False
             # запоминаем состояние распознавателя
             backtrack = self.stsymb
-            print(f'{"-"*offset}Ожидается {rule[0]}({rule[1]})')
+            #print(f'{"-"*offset}Ожидается {rule[0]}({rule[1]})')
             # если длина правила заведомо больше числа имеющихся токенов, отвергаем его
             if self.stsymb >= len(tokens):
-                print(f'{"-"*offset}Конец входной строки, правило отвергается')
+                #print(f'{"-"*offset}Конец входной строки, правило отвергается')
                 continue
             # если правило терминальное:
             if self.isTerminalRule(rule):
                 # читаем текущий токен
                 token = tokens[self.stsymb]
-                print(f'{"-"*offset}->Чтение {token}')
+                #print(f'{"-"*offset}->Чтение {token}')
                 # если полученный токен удовлетворяет предсказанию                
                 if token == rule[1][0]:
-                    print(f'{"-"*offset}->Токен {token} удовлетворяет предсказанию')
+                    #print(f'{"-"*offset}->Токен {token} удовлетворяет предсказанию')
                     # устанавливаем значение возврата на это правило
                     retval = tok_orig[self.stsymb].getToTree()
                     # сдвигаем указатель распознавателя на 1 символ вперед
@@ -64,9 +64,9 @@ class Parser:
                     break
                 # иначе рассматриваемое правило отвергается
                 else:
-                    print(f'{"-"*offset}Неверный токен {token}, правило отвергается')
+                    #print(f'{"-"*offset}Неверный токен {token}, правило отвергается')
                     # откатываем указатель до состояния в начале правила
-                    #pass
+                    pass
 
             # если правило нетерминальное
             else:
@@ -77,19 +77,19 @@ class Parser:
                     ret = self.parse_block(tokens, aw, offset + 2, tok_orig)
                     # если не произошло отката правила
                     if ret:
-                        print(f'{"-"*offset}->В дерево добавлено {ret}')
+                        #print(f'{"-"*offset}->В дерево добавлено {ret}')
                         tree[1].append(ret)
                     # откат правила
                     else:
                         # откатываем указатель до состояния в начале правила
                         self.stsymb = backtrack
                         # правило уже не будет распознано; цикл можно прервать
-                        print(f'{"-"*offset}Не удалось распознать правило {rule}, выбираем следующее правило; указатель {self.stsymb}')
+                        #print(f'{"-"*offset}Не удалось распознать правило {rule}, выбираем следующее правило; указатель {self.stsymb}')
                         interrupted_flag = True
                         break
                 # если правило распозналось
                 if not interrupted_flag:
-                    print(f'{"-"*offset}Прочитано дерево {tree}')
+                    #print(f'{"-"*offset}Прочитано дерево {tree}')
                     retval = tree
                     break 
         return retval

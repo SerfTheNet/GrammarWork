@@ -4,6 +4,7 @@ from os import system, remove
 def compilate(compiler_path, tree, id_type_dict):
     with open('temp.c', 'w') as f:
         f.write(intro(tree, id_type_dict))
+    print(intro(tree, id_type_dict))
     system(f"{compiler_path} temp.c")
     remove("temp.c")
     
@@ -13,7 +14,7 @@ def intro(tree, id_type_dict):
     return f"""
 #include "stdio.h"
     
-void main() {{
+int main(void) {{
 {codegen_recursive(tree, id_type_dict)}
 return 0;
 }}
@@ -53,7 +54,11 @@ def io(io_node, id_type_dict):
     if len(io_node[1]) == 2:
         del_type(io_node, 1)
         data = io_node[1][1]
-        modyfier = '%s' if id_type_dict[data] == 'str' else '%d'
+        try:
+            modyfier = '%s' if id_type_dict[data] == 'str' else '%d'
+            return f'printf("{modyfier}", {data}); \n'
+        except Exception as exc:
+            raise SystemExit('Синтаксическая ошибка входной программы', exc)
         return f'printf("{modyfier}", {data}); \n'
     # иначе
     else:
@@ -77,11 +82,13 @@ def loop(while_node, id_type_dict):
 
 def expression(expr_node, id_type_dict):
     del_type(expr_node, 2)
-    del_type(expr_node, 4)
+    # если присваивания с двумя операторами
+    if len(expr_node[1]) == 5:    
+        del_type(expr_node, 4)
     return f'{" ".join(expr_node[1])}; \n'
 
 def del_type(node, typed_const_position):
     # убираем тип на позиции 
     node[1][typed_const_position] = node[1][typed_const_position].split('|')[0]
-
+    
 #print(intro(stree))

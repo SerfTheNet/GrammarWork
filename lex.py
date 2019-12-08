@@ -79,5 +79,5 @@ class Token:
 def qlex(program_file):
    tokens = get_tokens(program_file)
    lexarr = lexify_tokens(tokens, lex_regulars)
-   print(lexarr)
+   #print(lexarr)
    return [Token(*lex) for lex in lexarr]
