@@ -1,4 +1,13 @@
 # -*- coding: utf-8 -*-
+from os import system
+
+def compilate(compiler_path, tree):
+    with open('temp.c', 'w') as f:
+        f.write(intro(tree))
+    system(f"{compiler_path} temp.c")
+    
+    
+
 def intro(tree):
     return f"""
 #include "stdio.h"
@@ -41,16 +50,19 @@ def dim(dim_node):
 def io(io_node):
     # если вывод
     if len(io_node[1]) == 2:
+        del_type(io_node, 1)
         data = io_node[1][1]
-        return f'printf("%d?", {data}); \n'
+        modyfier = '%s' if id_type_dict[data] == 'str' else '%d'
+        return f'printf("{modyfier}", {data}); \n'
     # иначе
     else:
         ids = io_node[1][0]
-        return f'scanf("%d?", &{ids}); \n'
+        modyfier = '%s' if id_type_dict[ids] == 'str' else '%d'
+        return f'scanf("{modyfier}", &{ids}); \n'
 
 def condition(cond_node):
     # убираем тип
-    cond_node[1][-1] = cond_node[1][-1].split('|')[0]
+    del_type(cond_node, -1)
     return ' '.join(cond_node[1])
 
 def ifs(if_node):
@@ -63,6 +75,12 @@ def loop(while_node):
     return f'while ({condition(while_node[1][1])}) {{\n{codegen_recursive(while_node[1][3])}}}'
 
 def expression(expr_node):
+    del_type(expr_node, 2)
+    del_type(expr_node, 4)
     return f'{" ".join(expr_node[1])}; \n'
 
-print(intro(stree))
+def del_type(node, typed_const_position):
+    # убираем тип на позиции 
+    node[1][typed_const_position] = node[1][typed_const_position].split('|')[0]
+
+#print(intro(stree))
