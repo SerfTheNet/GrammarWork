@@ -2,3 +2,4 @@
 *.exe
 tcc/**
 __pycache__/**
+.idea/**
