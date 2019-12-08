@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# требования к программе: Python 3.7, nltk, ghostcript, компилятор?
+# требования к программе: Python 3.7, nltk, ghostcript, компилятор tcc
 #
 from lex import qlex
 from sint import Parser

@@ -26,7 +26,7 @@ class Parser:
     def isTerminalRule(self, rule):
         return len(rule[1]) == 1 and rule[1][0] not in map(lambda x: x[0], self.grammar)
         
-    def parse(self, tokens, tok_orig, start = 'S'):
+    def parse(self, tokens: object, tok_orig: object, start: object = 'S') -> object:
         # ожидаемый символ - начальный символ        
         awaits = start
         # стартовый символ 0
