@@ -16,6 +16,10 @@ token_sint_map = list(map(str, tokens))
 
 parser = Parser(grammar_file)
 stree = parser.parse(token_sint_map, tokens, start = 'S')
+
+if stree == None:
+    raise SystemExit('Синтаксическая ошибка входной программы')
+
 id_type_dict = semant(stree, tokens)
 Parser.drawTree(stree)
 compilate(r'tcc\tcc.exe', stree, id_type_dict)
