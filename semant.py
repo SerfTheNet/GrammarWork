@@ -6,23 +6,88 @@ import re
 def semant(tree, tokens):
     id_type_dict = {}
     recursive_search(tree, id_type_dict)
-    check_type(tree, id_type_dict)
     for token in tokens:
-        
                 if token.l_type == 'const':
-                    if ('"' in token.word and len(re.sub('"', '', token.word))) <=80 or '"' not in token.word:
-                       
-                       id_type_dict[token.word] = token.inprog_type
+                    
+                    id_type_dict[token.word] = token.inprog_type
+                    
+                    if '"' in token.word and len(re.sub('"', '', token.word)) >=80:
+                       raise SystemExit('Длина строки превышена. Максимальное количество элементов - 80. ' , token.word)
     
     return id_type_dict
+
+
+def EXPRESSION(node, id_type_dict):
+    signs = ['+','-','*','/']
+    if node[0] not in id_type_dict.keys():
+        raise SystemExit('Переменная не объявлена ',node[0])
+    
+    str_node=node.copy()[2:]
+    
+    if len(str_node) == 1:
+        
+        if '|' not in str_node[0] and str_node[0] not in id_type_dict.keys():
+            raise SystemExit('Переменная не объявлена ',str_node[0])
+            
+        check_type=id_type_dict[str_node[0]] if str_node[0] in id_type_dict.keys() else str_node[0]
+        
+        if id_type_dict[node[0]] not in check_type and id_type_dict[node[0]] == 'int':
+            raise SystemExit('К целочисленной переменной невозможно присвоить строковую переменную')
+            
+        elif id_type_dict[node[0]] not in check_type and id_type_dict[node[0]] == 'str':
+            raise SystemExit('К строковой переменной невозможно присвоить целочисленную переменную')
+            
+        
+    elif len(str_node) > 1:
+        
+        del_znak=[i for i in str_node if i not in signs]
+        for i in del_znak:
+           if '|' not in i and i not in id_type_dict.keys():
+            raise SystemExit('Переменная не объявлена ',i)
+            
+        new_type_check=[id_type_dict[i] if i in id_type_dict.keys() else i for i in str_node]
+        
+        if id_type_dict[node[0]] == 'str':
+            check_int=[i for i in new_type_check if 'int' in i]
+            if check_int:
+                raise SystemExit('К строковой переменной невозможно присвоить целочисленную переменную')
+        
+        if id_type_dict[node[0]] == 'int':
+            check_int=[i for i in new_type_check if 'str' in i]
+            if check_int:
+                raise SystemExit('К целочисленной переменной невозможно присвоить строковую переменную')
+
+
+def CONDITION(node, id_type_dict):
+    
+    variables=[node[0],node[2]]
+    for i in variables:
+        if '|' not in i and i not in id_type_dict.keys():
+            raise SystemExit('Переменная не объявлена ',i)
+    
+    variables_type=[id_type_dict[i] if i in id_type_dict.keys() else i for i in variables] 
+    if variables_type[0] not in variables_type[1]:
+        raise SystemExit('Конфликт типов при сравнении')
+
+    
+    
     
 def recursive_search(tree, id_type_dict):
     
     for node in tree[1]:
+        
         if node[0] == 'DIM':
             
             inprog_type = 'str' if node[1][3] == 'string' else 'int'
             id_type_dict[node[1][1]] = inprog_type
+        
+        if node[0] == 'EXPRESSION':
+            
+            EXPRESSION(node[1], id_type_dict)
+            
+        if node[0] == 'CONDITION':
+            
+            CONDITION(node[1], id_type_dict)
                     
         elif isinstance(node, str):
             continue
@@ -30,60 +95,7 @@ def recursive_search(tree, id_type_dict):
             recursive_search(node, id_type_dict)
             
 
-def check_type(tree, id_type_dict):
-    
-    for node in tree[1]:
-        if node[0] == 'EXPRESSION':
-            try:
-                id_type_dict[node[1][0]]
-                str_node=node[1].copy()
-                del str_node[0]
-                del str_node[0]
-                if len(str_node) == 1:
-                    if id_type_dict[node[1][0]] in str_node[0]:
-                        pass
-                    elif id_type_dict[node[1][0]] == id_type_dict[str_node[0]]:
-                        pass
-                    else:
-                        try:
-                            raise SystemExit(id_type_dict[node[1][0]],' не может быть ', str_node[0].split('|')[1])
-                        except:
-                            raise SystemExit(id_type_dict[node[1][0]],' не может быть ', id_type_dict[str_node[0]])
-                else:
-                    new_type_check=[]
-                    for i in str_node:
-                        
-                        try:
-                            new_type_check.append(id_type_dict[i])
-                        except:
-                            new_type_check.append(i)
-                                 
-                    if id_type_dict[node[1][0]] == 'str':
-                        id_type=[i for i in new_type_check if 'int' in i]
-                        if id_type:
-                            raise SystemExit('Нельзя int использовать с str')
-                        elif '*' in new_type_check or '-' in new_type_check or '/' in new_type_check:
-                            raise SystemExit('Можно сложить только строки')
-                    elif id_type_dict[node[1][0]] == 'int':
-                        id_type=[i for i in new_type_check if 'str' in i]
-                        if id_type:
-                            raise SystemExit('Нельзя int использовать с str')
-    
-                            
-     
-                        
-                        
-                
-                
-            except Exception as exc:
-                raise SystemExit('Переменная не объявлена ',exc)
-            
-            
-            
-        elif isinstance(node, str):
-            continue
-        else:
-            check_type(node, id_type_dict)
+
             
             
             

@@ -1,18 +1,16 @@
 program EXAMPLE
     dim name as string ;
     dim flag as int ;
-    name = input ;
+    
+    flag = 6 ;
+       
+    name = "fwe" ;
+    
     if 
-        name == "Sergey"
+        name == "kjgbjkhsjbgkwekbgi"
     then
-        while
-            flag != 5
-        do
-            flag = flag + 1 ;
-            output flag
-        end
+        output "eg"
     end
-    else
-         output "You are not Sergey"
-    end
+    
+    
 end.

@@ -54,11 +54,7 @@ def io(io_node, id_type_dict):
     if len(io_node[1]) == 2:
         del_type(io_node, 1)
         data = io_node[1][1]
-        try:
-            modyfier = '%s' if id_type_dict[data] == 'str' else '%d'
-            return f'printf("{modyfier}", {data}); \n'
-        except Exception as exc:
-            raise SystemExit('Синтаксическая ошибка входной программы', exc)
+        modyfier = '%s' if id_type_dict[data] == 'str' else '%d'
         return f'printf("{modyfier}", {data}); \n'
     # иначе
     else:
